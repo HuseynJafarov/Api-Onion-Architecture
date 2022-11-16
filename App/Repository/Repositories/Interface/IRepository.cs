@@ -14,8 +14,9 @@ namespace Repository.Repositories.Interface
         Task<T> Get(int id);
         Task Create(T entity);
         Task Update(T entity);
-        Task Delete(int id);
-        Task<List<T>> GetAll(Expression<Func<T,bool>> expression);
+        Task Delete(T entity);
+        Task SoftDelete(T entity);
+        Task<List<T>> FindAllAsync(Expression<Func<T,bool>> expression);
 
     }
 }

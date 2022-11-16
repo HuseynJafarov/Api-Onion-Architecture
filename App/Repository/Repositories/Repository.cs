@@ -24,17 +24,21 @@ namespace Repository.Repositories
 
         public async Task Create(T entity)
         {
-            throw new NotImplementedException();
+            if (entity == null) throw new ArgumentNullException();
+            await _entities.AddAsync(entity);
+            await _context.SaveChangesAsync();
         }
 
-        public async Task Delete(int id)
+        public async Task Delete(T entity)
         {
-            throw new NotImplementedException();
+            _entities.Remove(entity);
+
+            await _context.SaveChangesAsync();
         }
 
         public async Task<T> Get(int id)
         {
-            T entity = await _entities.FindAsync(id) ?? throw new NotImplementedException();
+            T entity = await _entities.FindAsync(id) ?? throw new NullReferenceException();
             return entity;
         }
 
@@ -43,14 +47,30 @@ namespace Repository.Repositories
             return await _entities.ToListAsync();
         }
 
-        public async Task<List<T>> GetAll(Expression<Func<T, bool>> expression)
+        public async Task<List<T>> FindAllAsync(Expression<Func<T, bool>> expression)
         {
-            throw new NotImplementedException();
+            return await _entities.Where(expression).ToListAsync();
         }
 
         public async Task Update(T entity)
         {
-            throw new NotImplementedException();
+            if (entity == null) throw new ArgumentNullException();
+
+            _entities.Update(entity);
+
+            await _context.SaveChangesAsync();
+
+
+        }
+
+        public async Task SoftDelete(T entity)
+        {
+            T? model = await _entities.FirstOrDefaultAsync(m=> m.Id == entity.Id);
+            if(model == null) throw new NullReferenceException();
+
+            model.SoftDeleted = true;
+
+            _context.SaveChanges();
         }
     }
 }
